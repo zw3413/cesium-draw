@@ -43,7 +43,7 @@ module.exports = {
   productionSourceMap: false,
   css: {
     loaderOptions: {
-      sass: {
+      scss: {
         prependData: `
           @import "@/assets/css/theme/${theme}.scss";
         `

@@ -10,8 +10,16 @@ import Vue from 'vue'
 import './plugins/element.js'
 import App from './App'
 import "@/assets/css/iconfont.css";
+import vuetify from './plugins/vuetify';
+import axios from 'axios';
+
+// axios.defaults.headers.post['Content-Type']='text/plain'
+// axios.defaults.headers.get['Content-Type']='text/plain'
+axios.defaults.withCredentials=true;
+Vue.prototype.$axios =axios;
 
 Vue.config.productionTip = false
 new Vue({
-  render: h => h(App)
+ vuetify,
+ render: h => h(App)
 }).$mount('#app')

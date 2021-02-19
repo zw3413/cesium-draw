@@ -363,6 +363,12 @@ function pointVisibilityOnEarth(point, viewer) {
   return new Cesium.EllipsoidalOccluder(Cesium.Ellipsoid.WGS84, viewer.camera.position)
     .isPointVisible(point);
 }
+const SERVER = {
+  scheme:'http',
+  ip:'localhost',
+  post:'8081',
+  host:'http://localhost:8081'
+}
 export {
   moveDiv,
   errroCatch,
@@ -374,7 +380,8 @@ export {
   CVT,
   CursorTip,
   checkComponent,
-  checkViewer
+  checkViewer,
+  SERVER
 };
 export default {
   moveDiv,
@@ -385,5 +392,6 @@ export default {
   downloadFile,
   CVT,
   CursorTip,
-  pointVisibilityOnEarth
+  pointVisibilityOnEarth,
+  SERVER
 };

@@ -4,15 +4,56 @@
 @E-mail:zhangb@geovie.com.cn
 -->
 <template>
+
   <div>
     <earthViewer></earthViewer>
     <cesiumDrawViewer :extendMarkerImage="imags" ref='marker'></cesiumDrawViewer>
+
+    <fileManagerButton></fileManagerButton>
+
+
+ <v-container class="left">
+<v-expansion-panels>
+<v-expansion-panel>
+  <v-expansion-panel-header>
+文件
+  </v-expansion-panel-header>
+  <v-expansion-panel-content style="height:200px;padding:0">
+     <layerController></layerController>
+  </v-expansion-panel-content>
+</v-expansion-panel>
+
+<v-expansion-panel>
+  <v-expansion-panel-header>
+图层
+  </v-expansion-panel-header>
+  <v-expansion-panel-content>
+   
+  </v-expansion-panel-content>
+</v-expansion-panel>
+
+<v-expansion-panel>
+  <v-expansion-panel-header>
+数据
+  </v-expansion-panel-header>
+  <v-expansion-panel-content>
+     
+  </v-expansion-panel-content>
+</v-expansion-panel>
+</v-expansion-panels>
+
+ </v-container>
+
+
+   
   </div>
 </template>
 
 <script>
 import earthViewer from "./cesiumViewer";
+import layerController from "./layerController"
 import cesiumDrawViewer from '@/components/cesiumDrawViewer'
+import fileManagerButton from '@/components/fileManagerButton'
 const Cesium = window.Cesium;
 export default {
   data() {
@@ -39,7 +80,9 @@ export default {
   },
   components: {
     earthViewer,
+    layerController,
     cesiumDrawViewer,
+    fileManagerButton,
   },
   props: {},
   computed: {},
@@ -63,8 +106,6 @@ export default {
 };
 </script>
 
-<style scoped>
-</style>
 <style>
 /*定义滚动条高宽及背景 高宽分别对应横竖滚动条的尺寸*/
 ::-webkit-scrollbar {
@@ -103,4 +144,19 @@ export default {
   border: 0px;
   margin-left: 0px;
 }
+.left{
+  position: absolute;
+  padding:0;
+  margin:0;
+  width: 250px;
+  left:0;
+  top:0;
+}
+/* fileManagerButton{
+  position:absolute;
+  right:58px;
+  bottom:0;
+  height: 29px;
+  width:29px;
+} */
 </style>

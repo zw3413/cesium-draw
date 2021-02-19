@@ -9,11 +9,11 @@
 <template>
   <div id="drawtoolPanel" v-show="visible">
     <el-container>
-      <el-header id="drawtoolHead">
+      <!-- <el-header id="drawtoolHead">
         <span>基础标绘</span>
-        <span class="closebtn iconfont icondelete" @click="$emit('closeEvent')"></span>
+        <span class="closebtn iconfont icondelete" @click="$emit('closeEvent')"></span>-->
         <!-- <span class="clostbtn" @click="measurePanelShow=false"></span> -->
-      </el-header>
+      <!--</el-header> -->
       <el-main class="graphic-draw-main">
         <ul>
           <li>
@@ -676,6 +676,7 @@ export default {
       document.getElementById("graphicuploadhandler").click();
     },
     importfp() {
+      
       checkComponent(this)
       const self = this;
       const evt = event ? event : window.event;
@@ -1071,7 +1072,7 @@ export default {
   width: $draw-panel-width;
   top: 10px;
   right: 10px;
-  height: 85px;
+  height: (85-$title-height)px;
   right: 7px;
   border-radius: $b-radius;
   /* border: 1px solid #01c5fd;
@@ -1104,7 +1105,7 @@ export default {
 }
 .el-container {
   width: 400px;
-  height: 85px;
+  height: (85-$title-height)px;
   color: $color;
   background: $bg-color;
   /* border: 1px solid #01c5fd;

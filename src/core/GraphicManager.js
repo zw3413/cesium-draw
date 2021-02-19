@@ -551,7 +551,7 @@ class GraphicManager {
         const blob = new Blob([JSON.stringify(json)], { type: "" });
         saveAs(blob, type + parseInt(Cesium.getTimestamp()) + '.geojson');
     }
-    import(feat) {
+    import(feat) { 
         const id = this.generateId();
         let graphic, coordinates, positions = [];
         if (feat.geometry.type.toUpperCase() === 'LineString'.toUpperCase()) {
