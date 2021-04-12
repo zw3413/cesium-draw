@@ -51,7 +51,7 @@ export default {
       baseLayerPicker: false, //图层选择控件
       timeline: false, //时间轴
       fullscreenButton: true, //全屏显示
-      infoBox: true, //点击要素之后浮窗
+      infoBox: false, //点击要素之后浮窗
       sceneModePicker: false, //投影方式  三维/二维
       navigationInstructionsInitiallyVisible: false, //导航指令
       navigationHelpButton: false, //帮助信息
@@ -82,7 +82,7 @@ export default {
       baseLayerPicker: false, //图层选择控件
       timeline: false, //时间轴
       fullscreenButton: true, //全屏显示
-      infoBox: true, //点击要素之后浮窗
+      infoBox: false, //点击要素之后浮窗
       sceneModePicker: false, //投影方式  三维/二维
       navigationInstructionsInitiallyVisible: false, //导航指令
       navigationHelpButton: false, //帮助信息
@@ -151,8 +151,10 @@ export default {
       Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK
     );
     viewer.scene.postProcessStages.fxaa.enabled = false;
+
+    //加载后飞到中国上空
     viewer.camera.flyTo({
-     destination: Cesium.Cartesian3.fromDegrees(103.84, 31.15, 17850000),
+     destination: Cesium.Cartesian3.fromDegrees(103.84, 31.15, 7000000),
           orientation: {
             heading: Cesium.Math.toRadians(348.4202942851978),
             pitch: Cesium.Math.toRadians(-89.74026687972041),
@@ -164,7 +166,7 @@ export default {
       function (e) {
         e.cancel = true;
         viewer.camera.flyTo({
-          destination: Cesium.Cartesian3.fromDegrees(103.84, 31.15, 17850000),
+          destination: Cesium.Cartesian3.fromDegrees(103.84, 31.15, 7000000),
           orientation: {
             heading: Cesium.Math.toRadians(348.4202942851978),
             pitch: Cesium.Math.toRadians(-89.74026687972041),
@@ -206,7 +208,7 @@ export default {
   display: inherit;
 }
 .fullSize {
-  left: 250px;
+  left: 0;
   right: 0;
   width: auto;
 }

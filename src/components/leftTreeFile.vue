@@ -1,12 +1,13 @@
 <template>
-  <div class="layer-controller">
-    <v-app style="left:0">
+  <!-- <div class="layer-controller"> -->
+    <!-- <v-app style="left: 0;height:auto"> -->
+        <div style="left: 0; height:auto">
+    <v-app style="left: 0; height:auto">
       <v-main>
-  
-      <v-row>
-        <v-treeview v-model="item_selected" dense selectable :items="items">
-        </v-treeview>
-      </v-row>
+        <!-- <v-row> -->
+          <v-treeview v-model="item_selected" dense selectable :items="items">
+          </v-treeview>
+        <!-- </v-row> -->
       </v-main>
     </v-app>
   </div>
@@ -15,19 +16,25 @@
 import { SERVER } from "../js/utils";
 const host = SERVER.host;
 export default {
-  name: "layerController",
+  name: "leftTreeFile",
   data: function () {
     return {
       viewer: null,
-     
-      items: [],
       item_current: [],
       item_selected: [],
       ds: {},
-    
       widgets: false,
-      
     };
+  },
+  computed: {
+    items: {
+      get: function () {
+          return this.$store.state.fileList;
+      },
+      set: function (nv) {
+        this.$store.commit('setFileList',{fileList:nv})
+      },
+    },
   },
   methods: {
     addKML: function (id) {
@@ -81,29 +88,17 @@ export default {
         this.remKML(v);
       });
     },
-    list: function () {
-      this.$axios.get(host + "/d3/list").then((resp) => {
-        if (resp && resp.data) {
-          let result = resp.data;
-          if (result.code == "200") {
-            let data = result.data;
-            this.files = data;
-          } else {
-            alert("获取文件列表出错:" + result.message);
-          }
+    list: async function () {
+      let resp = await this.$axios.get(host + "/d3/group");
+      if (resp && resp.data) {
+        let result = resp.data;
+        if (result.code == "200") {
+          let data = result.data;
+          this.$store.commit('fileList',{fileList:data});
+        } else {
+          alert("获取树形列表出错:" + result.message);
         }
-      });
-      this.$axios.get(host + "/d3/group").then((resp) => {
-        if (resp && resp.data) {
-          let result = resp.data;
-          if (result.code == "200") {
-            let data = result.data;
-            this.items = data;
-          } else {
-            alert("获取树形列表出错:" + result.message);
-          }
-        }
-      });
+      }
     },
   },
   watch: {
@@ -117,15 +112,18 @@ export default {
   },
 };
 </script>
-<style>
+<style scoped>
 [v-cloak] {
   display: none;
 }
- /* .layer-controller .v-application{
+/* .layer-controller .v-application{
  
 
 
 }  */
+#app{
+  height:auto !important
+}
 /* .details > .row {
   border-bottom: 1px dashed lightgrey;
 } */

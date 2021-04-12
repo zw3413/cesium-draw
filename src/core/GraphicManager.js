@@ -166,14 +166,13 @@ class GraphicManager {
             this.editManager.outlineStyle = option
         }
     }
-
-
-
     /**
      * 
      * @param {Object} options 定义一个CesiumPolyline
      */
     createPolyline(options = CesiumPolyline.defaultStyle) {
+        // eslint-disable-next-line
+        debugger
         this.graphicType = GraphicType.POLYLINE;
         const id = this.generateId();
         options.positions = this.positions;
@@ -199,6 +198,7 @@ class GraphicManager {
                 gvid: manager.gvid,
                 gvtype: manager.gvtype,
                 gvname: manager.gvname,
+                options:options
             }
         })
         document.dispatchEvent(evt);
@@ -210,7 +210,6 @@ class GraphicManager {
         return manager
 
     }
-
     /**
      * 
      * @param {Object} options 定义一个CesiumPolygon
@@ -246,6 +245,7 @@ class GraphicManager {
                 gvid: manager.gvid,
                 gvtype: manager.gvtype,
                 gvname: manager.gvname,
+                options:options
             }
         })
         document.dispatchEvent(evt)
@@ -291,6 +291,8 @@ class GraphicManager {
         const self = this
         const viewer = this.viewer
         const clickHandler = function (e) {
+            // eslint-disable-next-line
+            debugger
             //编辑要素
             if (self.mode === 'edit') {
                 if (!self.editManager) {
@@ -365,8 +367,15 @@ class GraphicManager {
             self.mode = 'create'
         }
         const rightHandler = function () {
+            // eslint-disable-next-line 
+            debugger
             const manager = self.manager.get(self.graphicId);
             if ((self.mode === 'create') && manager) {
+                let geojson = null;
+               // if (manager != null && manager.toGeoJson()) {
+                    geojson = JSON.stringify(manager.toGeoJson().geometry);
+              //  }
+                window.vue.$store.commit('updateElement',{ele:{id:self.graphicId,geojson:geojson}})
                 manager.stopEdit();
                 self.graphicType = undefined;
                 self.graphicId = undefined;
@@ -392,7 +401,6 @@ class GraphicManager {
             document.dispatchEvent(evt)
             self.removeEventListener()
         }
-
         const moseMoveHandler = function (e) {
             let cartesian = CVT.pixel2Cartesian(e.endPosition, self.viewer);
             if (/.*MODEL.*/.test(self._heightReference)) {
@@ -476,7 +484,6 @@ class GraphicManager {
      * 当图形处于ready状态时，不想画了
      */
     cancel() {
-
         const manager = this.manager.get(this.graphicId);
         manager && manager.stopEdit();
         manager && manager.destroy()
@@ -590,7 +597,6 @@ class GraphicManager {
         return graphic
 
     }
-
     removeEventListener() {
         this.handler.removeInputAction(LEFT_CLICK);
         this.handler.removeInputAction(MOUSE_MOVE);
@@ -607,7 +613,6 @@ class GraphicManager {
         this.manager.clear();
         this.tip.visible = false;
     }
-
     destroy() {
         this.activeManager = undefined
         this.manager = undefined

@@ -1,5 +1,5 @@
 <template>
-  <div  class="fileManagerButton">
+  <div class="fileManagerButton">
     <v-dialog
       v-model="dialog"
       fullscreen
@@ -45,8 +45,8 @@
                   v-model="file"
                   required
                   show-size
-                  accept=".kml,.kmz"
-                  label="点击选择文件，文件格后缀为：.kml、.kmz"
+                  v-bind:accept="accept"
+                  v-bind:label="label"
                 ></v-file-input>
               </v-col>
               <v-spacer></v-spacer>
@@ -86,7 +86,9 @@ export default {
   data: function () {
     return {
       file_selected: [],
-        dialog: false,
+      dialog: false,
+      accept:".kml,.geojson,.shp",
+
       headers: [
         {
           text: "文件名称",
@@ -102,59 +104,12 @@ export default {
       file: null,
     };
   },
-    methods: {
-    addKML: function (id) {
-      const Cesium = window.Cesium;
-      const options = window.options;
-      //options.offset = new Cesium.HeadingPitchRange(Cesium.Math.toRadians(0), Cesium.Math.toRadians(45), 2500);
-      var promise = Cesium.KmlDataSource.load(
-        host + "/d3/data/kml/" + id,
-        options
-      );
-      this.viewer.dataSources.add(promise);
-      this.viewer.flyTo(promise, options);
-
-      var that = this;
-      Cesium.when(promise, function (dataSource) {
-        that.ds[id] = dataSource;
-      });
-    },
-    remKML: function (id) {
-      var ds = this.ds[id];
-      this.viewer.dataSources.remove(ds);
-      delete this.ds[id];
-    },
-    loadKML: function (item_selected) {
-      //对比出来当前加载的和重新选择的变化的是哪个
-      var add = [];
-      var del = [];
-      //遍历当前选中，如果哪个不在current中，认为其为新增
-      for (let i in item_selected) {
-        var sId = item_selected[i];
-        if (sId) {
-          if (!this.item_current.includes(sId)) {
-            add.push(sId);
+  computed:{
+          label:function(){
+              return "接收的文件格式："+this.accept
           }
-        }
-      }
-      //遍历当前显示，如果哪个不在select中，认为其为删除
-      for (let i in this.item_current) {
-        var cId = this.item_current[i];
-        if (cId) {
-          if (!item_selected.includes(cId)) {
-            del.push(cId);
-          }
-        }
-      }
-      this.item_current = this.item_selected;
-      add.forEach((v) => {
-        this.addKML(v);
-      });
-      del.forEach((v) => {
-        this.remKML(v);
-      });
-    },
-
+  },
+  methods: {
     delFile: function () {
       if (this.file_selected && this.file_selected.length > 0) {
         let ids = [];
@@ -176,10 +131,6 @@ export default {
         });
       }
     },
-    addLayer: function () {
-      alert(1);
-    },
-
     uploadFile: function () {
       let formData = new FormData();
       let that = this;
@@ -187,9 +138,7 @@ export default {
         that.list();
         that.file = null;
       };
-
       formData.append("file", this.file);
-
       return this.$axios.post(host + "/d3/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -215,7 +164,7 @@ export default {
           let result = resp.data;
           if (result.code == "200") {
             let data = result.data;
-            this.items = data;
+            this.$store.commit('fileList',{fileList:data})
           } else {
             alert("获取树形列表出错:" + result.message);
           }
@@ -224,12 +173,9 @@ export default {
     },
   },
   watch: {
-    item_selected: function (nv) {
-      this.loadKML(nv);
+    dialog: function (v) {
+      console.log(v);
     },
-    dialog:function(v){
-      console.log(v)
-    }
   },
   mounted: function () {
     this.viewer = window.cesiumViewer;
@@ -238,18 +184,19 @@ export default {
 };
 </script>
 <style scoped>
-.fileManagerButton{
-  position:absolute;
-  left:auto;
-  top:auto;
-  right:58px;
-  bottom:0;
+.fileManagerButton {
+  z-index: 1000;
+  position: absolute;
+  left: auto;
+  top: auto;
+  right: 58px;
+  bottom: 0;
   height: 29px;
-  width:29px;
+  width: 29px;
 }
-svg{
-  padding:0;
-  margin:2.5px !important;
+svg {
+  padding: 0;
+  margin: 2.5px !important;
 }
 .v-dialog__container {
   display: block !important;

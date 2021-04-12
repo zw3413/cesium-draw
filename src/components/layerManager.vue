@@ -11,7 +11,10 @@
     <div class="layer-manager-header" id="layer-manager-header">
       <i class="iconfont iconclose1"></i>
       <span>标绘清单</span>
-      <span class="closebtn iconfont iconclose" @click="closeLayerManaer"></span>
+      <span
+        class="closebtn iconfont iconclose"
+        @click="closeLayerManaer"
+      ></span>
     </div>
     <div class="layer-manager-tools">
       <span class="el-dropdown-link" @click="importHandler">
@@ -26,10 +29,18 @@
           </i>
         </span>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item command="MARKER" class="iconfont iconmarker">标记</el-dropdown-item>
-          <el-dropdown-item command="POLYLINE" class="iconfont iconpolyline">线</el-dropdown-item>
-          <el-dropdown-item command="POLYGON" class="iconfont iconpolygon">多边形</el-dropdown-item>
-          <el-dropdown-item command="LABEL" class="iconfont iconlabel">书签</el-dropdown-item>
+          <el-dropdown-item command="MARKER" class="iconfont iconmarker"
+            >标记</el-dropdown-item
+          >
+          <el-dropdown-item command="POLYLINE" class="iconfont iconpolyline"
+            >线</el-dropdown-item
+          >
+          <el-dropdown-item command="POLYGON" class="iconfont iconpolygon"
+            >多边形</el-dropdown-item
+          >
+          <el-dropdown-item command="LABEL" class="iconfont iconlabel"
+            >书签</el-dropdown-item
+          >
         </el-dropdown-menu>
       </el-dropdown>
       <i class="iconfont iconremove action-icon-last-class" @click="removeAll">
@@ -43,11 +54,15 @@
         node-key="id"
         ref="tree"
         @check="checkAction"
-        :default-expanded-keys="['marker','polyline','polygon']"
+        :default-expanded-keys="['marker', 'polyline', 'polygon']"
       >
         <span class="custom-tree-node" slot-scope="{ node, data }">
           <i :class="data.icon" class="action-item"></i>
-          <el-input v-model="newName" v-if="data.edit" @keypress.enter.native="renameAction(data)"></el-input>
+          <el-input
+            v-model="newName"
+            v-if="data.edit"
+            @keypress.enter.native="renameAction(data)"
+          ></el-input>
           <span class="node-name action-item" v-else>{{ data.text }}</span>
           <span v-if="!data.children" class="action-class">
             <i
@@ -65,72 +80,77 @@
   </div>
 </template>
 <script>
+// import { SERVER } from "../js/utils";
+// const host = SERVER.host;
 export default {
   data() {
     return {
-      markerTree: new Map(),
-      polylineTree: new Map(),
-      polygonTree: new Map(),
-      labelTree: new Map(),
+      markerTree: new Map(), //标记(billboard)
+      polylineTree: new Map(), //折线
+      polygonTree: new Map(), //多边形
+      labelTree: new Map(), //文字
       modelTree: new Map(),
       renameNodeStatus: false,
       checked: [],
       newName: "",
+      items:{
+
+      },
       json: [
         {
           id: "marker",
           text: "标记",
           type: "marker",
           icon: "iconfont icon-lujing",
-          children: []
+          children: [],
         },
         {
           id: "polyline",
           text: "线",
           type: "polyline",
           icon: "iconfont iconpolyline",
-          children: []
+          children: [],
         },
         {
           id: "polygon",
           text: "多边形",
           type: "polygon",
           icon: "iconfont iconpolygon",
-          children: []
+          children: [],
         },
         {
           id: "label",
           text: "文字",
           type: "label",
           icon: "iconfont iconlabel",
-          children: []
+          children: [],
         },
         {
           id: "model",
           icon: "iconfont iconmodel",
           text: "模型",
           type: "model",
-          children: []
-        }
+          children: [],
+        },
       ],
       defaultTools: {
         locate: { text: "定位", icon: "iconlocate", action: this.locate },
         rename: {
           text: "重命名",
           icon: "iconrename",
-          action: this.rename
+          action: this.rename,
         },
         edit: { text: "编辑", icon: "iconedit", action: this.edit },
-        drop: { text: "删除", icon: "iconremove", action: this.drop }
-      }
+        drop: { text: "删除", icon: "iconremove", action: this.drop },
+      },
     };
   },
   props: {
     tools: {
-      default: function() {
+      default: function () {
         return this.defaultTools;
-      }
-    }
+      },
+    },
   },
   mounted() {},
   computed: {},
@@ -145,7 +165,41 @@ export default {
     locate(data) {
       this.$emit("locate", data.id);
     },
-    rename(data, id, text) {
+    operateElement(op, id, name, type,options) {
+      if(type === '0' || type ===0){
+        type = 'marker';
+      }else if(type === '1' || type ===1){
+        type = 'polyline';  
+      }else if(type === '2' || type ===2){
+        type = 'polygon';  
+      }else if(type === '3' || type ===3){
+        type = 'label';  
+      }
+
+
+       if (type === "removeAll") {
+        this.removeAllElements();
+      }
+
+      let style ={
+        ...options
+      }
+      delete style.positions;
+      // eslint-disable-next-line
+      debugger
+      switch (op) {
+        case "add":
+          this.$store.commit('addElement',{ele:{id:id,name:name,type:type,style:style}})
+          break;
+        case "update":
+          this.$store.commit('updateElement',{ele:{id:id,name:name,type:type,style:style}})
+          break;
+        case "drop":
+          this.$store.commit('dropElement',{ele:{id:id,name:name,type:type}})
+          break;
+      }
+    },
+    rename(data, id, text,options) {
       // data.edit=true;
       if (data) {
         this.$set(data, "edit", true);
@@ -153,8 +207,10 @@ export default {
       } else {
         for (let ls of this.json) {
           for (let l of ls.children) {
+            let type = ls.id;
             if (l.id === id) {
               l.text = text;
+              this.operateElement("update", id, text, type,options);
             }
           }
         }
@@ -182,8 +238,10 @@ export default {
       for (let ls of this.json) {
         let i = 0;
         for (let l of ls.children) {
+          //let type = ls.id;
           if (l.id === data.id) {
             ls.children.splice(i, 1);
+            //this.operateElement("drop", l.id, null , type);
             break;
           }
           i++;
@@ -194,22 +252,25 @@ export default {
       this.$emit("clear");
       for (let ls of this.json) {
         ls.children.splice(0);
+        this.operateElement("removeAll", null, null, null);
       }
       this.$nextTick(() => {
         this.$refs.tree.setCheckedKeys([]);
       });
     },
-    insertLayer(type, id, name) {
+    insertLayer(type, id, name,options) {
       name = name || "未命名";
       this.json[type].children.push({
         id: id,
         text: name,
-        icon: "el-icon-document"
+        icon: "el-icon-document",
       });
+
       this.checked.push(id);
       this.$nextTick(() => {
         this.$refs.tree.setCheckedKeys(this.checked);
       });
+      this.operateElement("add", id, name , type, options);
     },
     exportHandler(cmd) {
       this.$emit("export", cmd);
@@ -219,8 +280,8 @@ export default {
     },
     closeLayerManaer() {
       this.$emit("close");
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang='scss' scoped>

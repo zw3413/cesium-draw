@@ -4,56 +4,51 @@
 @E-mail:zhangb@geovie.com.cn
 -->
 <template>
-
   <div>
     <earthViewer></earthViewer>
-    <cesiumDrawViewer :extendMarkerImage="imags" ref='marker'></cesiumDrawViewer>
+    <cesiumDrawViewer
+      :extendMarkerImage="imags"
+      ref="marker"
+    ></cesiumDrawViewer>
 
     <fileManagerButton></fileManagerButton>
 
+    <v-container class="left">
+      <v-expansion-panels>
+        <v-expansion-panel>
+          <v-expansion-panel-header> 文件 </v-expansion-panel-header>
+          <v-expansion-panel-content >
 
- <v-container class="left">
-<v-expansion-panels>
-<v-expansion-panel>
-  <v-expansion-panel-header>
-文件
-  </v-expansion-panel-header>
-  <v-expansion-panel-content style="height:200px;padding:0">
-     <layerController></layerController>
-  </v-expansion-panel-content>
-</v-expansion-panel>
+            <left-tree-file></left-tree-file>
 
-<v-expansion-panel>
-  <v-expansion-panel-header>
-图层
-  </v-expansion-panel-header>
-  <v-expansion-panel-content>
-   
-  </v-expansion-panel-content>
-</v-expansion-panel>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
 
-<v-expansion-panel>
-  <v-expansion-panel-header>
-数据
-  </v-expansion-panel-header>
-  <v-expansion-panel-content>
-     
-  </v-expansion-panel-content>
-</v-expansion-panel>
-</v-expansion-panels>
+        <v-expansion-panel>
+          <v-expansion-panel-header> 图层 </v-expansion-panel-header>
+          <v-expansion-panel-content> </v-expansion-panel-content>
+        </v-expansion-panel>
 
- </v-container>
+        <v-expansion-panel>
+          <v-expansion-panel-header> 位置 </v-expansion-panel-header>
+          <v-expansion-panel-content> 
 
+            <left-tree-place></left-tree-place>
 
-   
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
+    </v-container>
   </div>
 </template>
 
 <script>
-import earthViewer from "./cesiumViewer";
-import layerController from "./layerController"
-import cesiumDrawViewer from '@/components/cesiumDrawViewer'
-import fileManagerButton from '@/components/fileManagerButton'
+/* eslint-disable */
+import earthViewer from "./earthViewer";
+import leftTreeFile from "../components/leftTreeFile";
+import leftTreePlace from "../components/leftTreePlace";
+import cesiumDrawViewer from "@/components/cesiumDrawViewer";
+import fileManagerButton from "@/components/fileManagerButton";
 const Cesium = window.Cesium;
 export default {
   data() {
@@ -61,48 +56,48 @@ export default {
       drawHelper: "",
       viewerMounted: false,
       drawviewerShow: true,
-      imags : [
-      "./static/images/markers/1.png",
-      "./static/images/markers/2.png",
-      "./static/images/markers/3.png",
-      "./static/images/markers/4.png",
-      "./static/images/markers/5.png",
-      "./static/images/markers/6.png",
-      "./static/images/markers/7.png",
-      "./static/images/markers/8.png",
-       "./static/images/markers/5.png",
-      "./static/images/markers/6.png"
-    ],
-    model:[{ id: "model0", name: "木塔", url: "static/model/Wood_Tower.gltf" },
-          { id: "model1", name: "人", url: "static/model/Cesium_Man.gltf" }]
-      
+      imags: [
+        "./static/images/markers/1.png",
+        "./static/images/markers/2.png",
+        "./static/images/markers/3.png",
+        "./static/images/markers/4.png",
+        "./static/images/markers/5.png",
+        "./static/images/markers/6.png",
+        "./static/images/markers/7.png",
+        "./static/images/markers/8.png",
+        "./static/images/markers/5.png",
+        "./static/images/markers/6.png",
+      ],
+      model: [
+        { id: "model0", name: "木塔", url: "static/model/Wood_Tower.gltf" },
+        { id: "model1", name: "人", url: "static/model/Cesium_Man.gltf" },
+      ],
     };
   },
   components: {
     earthViewer,
-    layerController,
+    leftTreeFile,
+    leftTreePlace,
     cesiumDrawViewer,
     fileManagerButton,
   },
   props: {},
   computed: {},
-  beforeMount() {
-  },
+  beforeMount() {},
   mounted() {
     // self.viewer = window.cesiumViewer;
-    const viewer =  window.cesiumViewer;
-    const tileset=new Cesium.Cesium3DTileset({
-      url:'static/Photogrammetry/tileset.json'
-    })
+    const viewer = window.cesiumViewer;
+    const tileset = new Cesium.Cesium3DTileset({
+      url: "static/Photogrammetry/tileset.json",
+    });
     this.$refs.marker.init(viewer);
-    tileset.readyPromise.then(t=>{
-      viewer.scene.primitives.add(t)
+    tileset.readyPromise.then((t) => {
+      viewer.scene.primitives.add(t);
       // viewer.camera.viewBoundingSphere(t.boundingSphere)
-    })
+    });
   },
-  methods: {
-  },
-  watch: {}
+  methods: {},
+  watch: {},
 };
 </script>
 
@@ -144,13 +139,24 @@ export default {
   border: 0px;
   margin-left: 0px;
 }
-.left{
+.left {
   position: absolute;
-  padding:0;
-  margin:0;
+  padding: 0;
+  margin: 0;
   width: 250px;
-  left:0;
-  top:0;
+  left: 0;
+  top: 0;
+  height:auto
+}
+.left .v-expansion-panel-content *{
+  background-color:rgba(23,30,38,0.5)
+
+}
+.left .v-expansion-panel-header{
+   background-color:rgba(23,30,38,0.8)
+}
+.left *{
+  color: #3a89dd !important
 }
 /* fileManagerButton{
   position:absolute;

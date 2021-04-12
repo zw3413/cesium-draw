@@ -124,9 +124,11 @@ export default {
             self.$emit("editEvent", type);
         });
         window.addEventListener("marker-add", e => {
+            // eslint-disable-next-line
+            debugger
             self.winPos = self.markerManager.panelPosition();
             self.visible = true;
-            self.$emit("addEvent", e.detail.id, e.detail.name, e.detail.type);
+            self.$emit("addEvent", e.detail.id, e.detail.name, e.detail.type, e.detail.options);
         });
         window.addEventListener("marker-delete", e => {
             self.visible = false;
@@ -135,7 +137,9 @@ export default {
             self.markRemark = "";
         });
         window.addEventListener("marker-update", e => {
-            self.$emit("updateEvent", e.detail.id, e.detail.name);
+            // eslint-disable-next-line
+            //debugger
+            self.$emit("updateEvent", e.detail.id, e.detail.name,e.detail.options);
             self.markName = "";
             self.markRemark = "";
         });
@@ -153,6 +157,10 @@ export default {
             !this.markerManager && (this.markerManager = new MarkerManager(viewer));
             this.images = [this.markerManager.defaultImage, ...this.extendImage];
             this.selectedImage = this.markerManager.defaultImage;
+            // eslint-disable-next-line
+            //debugger
+            top.markers = this.markerManager.manager;
+            top.markerManager = this.markerManager;
         },
         pick(type = "marker", mode = "single") {
             checkComponent(this)
@@ -275,6 +283,8 @@ export default {
         },
         update() {
             if (this.markerManager) {
+                // eslint-disable-next-line
+                //debugger
                 this.markerManager.update(this.markName, this.markRemark);
                 this.visible = false;
             }
@@ -282,6 +292,8 @@ export default {
         changeHandler(img) {
             if (this.markerManager) {
                 this.markerManager.changeHandler(img);
+                //将值更新到后台
+                this.markerManager.markerOptions.image=img;
                 this.selectedImage=img;
             }
             this.selectPanel = false;

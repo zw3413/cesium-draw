@@ -310,6 +310,7 @@
         ></el-slider>
       </div>
     </div>
+
     <MarkerViewer
       ref="markerManager"
       :attachment="attachment"
@@ -319,6 +320,7 @@
       @updateEvent="updateMarker"
       :extendImage="extendMarkerImage"
     ></MarkerViewer>
+
     <layerManager
       ref="layerManager"
       @locate="locateGraphic"
@@ -335,6 +337,7 @@
       class="layer-manager-class"
       :class="{'edit-layer-manager-class':editMode}"
     ></layerManager>
+
     <input
       type="file"
       v-show="false"
@@ -342,9 +345,11 @@
       id="graphicuploadhandler"
       accept=".geojson, .shp"
     />
+    
   </div>
 </template>
 <script>
+/* eslint-disable */ 
 import GraphicManager from "../core/GraphicManager";
 import MarkerViewer from "../components/markerViewer";
 import { CesiumPolygon } from "../core/Graphic";
@@ -483,6 +488,7 @@ export default {
       self.syncColor("lineColor", self.lineColor);
       self.syncColor("polygonColor", self.polygonColor);
     });
+    window.drawViewer = this;
   },
   methods: {
     init(viewer) {
@@ -495,47 +501,56 @@ export default {
         viewer.scene.globe.depthTestAgainstTerrain;
       this.$refs.markerManager.init(viewer);
       graphicManager = new GraphicManager(viewer);
+      top.graphics = graphicManager.manager;
+      top.graphicManager = graphicManager;
       this.selectedModel = this.extendMarkerModel.length
         ? this.extendMarkerModel[0].url
         : undefined;
       this.cesiumViewer = viewer;
       this._viewer=viewer
       document.addEventListener("addEvent", function(e) {
-      if (
-        graphicManager.has(e.detail.gvid) ||
-        self.$refs.markerManager.has(e.detail.gvid)
-      ) {
-        self.pushLayerManaer(e.detail.gvtype, e.detail.gvid, e.detail.gvname);
-      }
-    });
-    document.addEventListener("stopEdit", function() {
-      self.menuSelected = {};
-      self.editMode = false;
-      self.cesiumViewer.scene.globe.depthTestAgainstTerrain =
-        self._depthTestAgainstTerrain;
-    });
-    document.addEventListener("startEdit", function(e) {
-      self.menuSelected = {};
-      self.menuSelected[e.detail.graphicType] = true;
-      self.setControlByEvent(e);
-      self.editMode = true;
+        if (
+          graphicManager.has(e.detail.gvid) || self.$refs.markerManager.has(e.detail.gvid)
+        ){
+            self.pushLayerManaer(e.detail.gvtype, e.detail.gvid, e.detail.gvname, e.detail.options);
+        }
+      });
 
-      if (/.*MODEL.*/.test(self.graphicHeight)) {
-        self.cesiumViewer.scene.globe.depthTestAgainstTerrain = true;
-      }
-    });
-    document.addEventListener("destroyEvent", function(e) {
-      self.$refs.layerManager.drop({id:e.detail.gvid});      
-      self.cesiumViewer.scene.globe.depthTestAgainstTerrain =
-        self._depthTestAgainstTerrain;
-    });
-    document.addEventListener("deleteEvent", function(e) {
-      self.menuSelected = {};
-      self.editMode = false;
-      self.$refs.layerManager.drop({id:e.detail.gvid});      
-      self.cesiumViewer.scene.globe.depthTestAgainstTerrain =
-        self._depthTestAgainstTerrain;
-    });
+      document.addEventListener("stopEdit", function() {
+        self.menuSelected = {};
+        self.editMode = false;
+        self.cesiumViewer.scene.globe.depthTestAgainstTerrain = self._depthTestAgainstTerrain;
+
+        // eslint-disable-next-line 
+        debugger
+        window.showElements()
+//        console.log(this.$refs.LayerManager.json)
+      });
+
+      document.addEventListener("startEdit", function(e) {
+        self.menuSelected = {};
+        self.menuSelected[e.detail.graphicType] = true;
+        self.setControlByEvent(e);
+        self.editMode = true;
+
+        if (/.*MODEL.*/.test(self.graphicHeight)) {
+          self.cesiumViewer.scene.globe.depthTestAgainstTerrain = true;
+        }
+      });
+
+      document.addEventListener("destroyEvent", function(e) {
+        self.$refs.layerManager.drop({id:e.detail.gvid});      
+        self.cesiumViewer.scene.globe.depthTestAgainstTerrain =
+          self._depthTestAgainstTerrain;
+      });
+      
+      document.addEventListener("deleteEvent", function(e) {
+        self.menuSelected = {};
+        self.editMode = false;
+        self.$refs.layerManager.drop({id:e.detail.gvid});      
+        self.cesiumViewer.scene.globe.depthTestAgainstTerrain =
+          self._depthTestAgainstTerrain;
+      });
     },
     syncColor(parent, color) {
       const parents = [parent];
@@ -557,10 +572,9 @@ export default {
         }
       }
     },
-
-    pushLayerManaer(type, id, name) {
+    pushLayerManaer(type, id, name,options) {
       checkComponent(this)
-      this.$refs.layerManager.insertLayer(type, id, name);
+      this.$refs.layerManager.insertLayer(type, id, name,options);
     },
     modelThumb(item) {
       if (item.thumb) {
@@ -643,18 +657,23 @@ export default {
       }
       this.markerOptionsVisible = false;
     },
-    updateMarker(gvid, gvname) {
+    updateMarker(gvid, gvname,options) {
       checkComponent(this)
       if (gvid) {
         gvname = gvname || "未命名";
-        this.$refs.layerManager.rename(null, gvid, gvname);
+        this.$refs.layerManager.rename(null, gvid, gvname,options);
       }
       this.editMode = false;
       this.menuSelected = {};
+      // eslint-disable-next-line 
+      debugger
+      window.showElements()
     },
-    addMarker(gvid, gvname, gvtype) {
+    addMarker(gvid, gvname, gvtype,options) {
+       // eslint-disable-next-line 
+      debugger
       checkComponent(this)
-      this.pushLayerManaer(gvtype, gvid, gvname);
+      this.pushLayerManaer(gvtype, gvid, gvname,options);
       if (gvtype === GraphicType.MODEL) {
         this.editMode = false;
         this.menuSelected = {};
@@ -675,8 +694,7 @@ export default {
       checkComponent(this)
       document.getElementById("graphicuploadhandler").click();
     },
-    importfp() {
-      
+    importfp() {  
       checkComponent(this)
       const self = this;
       const evt = event ? event : window.event;
@@ -730,6 +748,8 @@ export default {
       }
     },
     editMarker(type) {
+       // eslint-disable-next-line 
+      debugger
       checkComponent(this)
       this.editMode = true;
       // this.stopOthers();
@@ -741,10 +761,14 @@ export default {
       this.menuSelected[type] = true;
     },
     clearGraphic() {
+       // eslint-disable-next-line 
+      debugger
       this.$refs.markerManager.removeAll();
       graphicManager.removeAll();
     },
     deleteMarker(id) {
+       // eslint-disable-next-line 
+      debugger
       checkComponent(this)
       this.menuSelected["MARKER"] = false;
       this.editMode = false;
@@ -752,6 +776,8 @@ export default {
     },
     locateGraphic(id) {
       checkComponent(this)
+      // eslint-disable-next-line
+      debugger //清单-定位
       if (graphicManager.manager.has(id)) {
         const manager = graphicManager.manager.get(id);
         manager.zoomTo();
@@ -761,6 +787,8 @@ export default {
       this.$emit("locateEvent", id);
     },
     editGraphic(id) {
+       // eslint-disable-next-line 
+      debugger
       checkComponent(this)
       if (graphicManager.manager.has(id)) {
         // const manager = graphicManager.manager.get(id);
@@ -771,6 +799,8 @@ export default {
       this.$emit("editEvent", id);
     },
     selectGraphic(id, state) {
+       // eslint-disable-next-line 
+      debugger
       checkComponent(this)
       if (id === "marker") {
         this.$refs.markerManager.select(GraphicType.MARKER, undefined, state);
@@ -792,6 +822,8 @@ export default {
       this.$emit("selectEvent", id, state);
     },
     deleteGraphic(id) {
+       // eslint-disable-next-line 
+      debugger
       checkComponent(this)
       if (graphicManager.manager.has(id)) {
         const manager = graphicManager.manager.get(id);
@@ -804,6 +836,8 @@ export default {
       // this.$refs.layerManager.deleteNode(id)
     },
     renameGraphic(id, name) {
+       // eslint-disable-next-line 
+      debugger
       checkComponent(this)
       const attr = /(.*?)</g.exec(name);
       name = /(.*?)</g.test(name) ? attr[1] : name;
@@ -822,6 +856,8 @@ export default {
     },
     menuAction(menu) {
       checkComponent(this)
+      // eslint-disable-next-line
+      debugger
       const graphic = ["MARKER", "POLYLINE", "POLYGON", "LABEL", "MODEL"];
       const bool = this.menuSelected[menu];
       this.menuSelected = {};
@@ -842,7 +878,7 @@ export default {
       } else {
         this.editMode = false;
       }
-      this.stopOthers(menu);
+      //this.stopOthers(menu);
       if (/.*MODEL*/.test(this.graphicHeight)) {
         if (!["MARKER", "LABEL", "MODEL", "LAYER"].includes(menu))
           //依附模型
@@ -876,6 +912,7 @@ export default {
           this.heightList[3].name = "空间面";
           if (this.editMode) {
             //   this.lineHeight=undefined
+            debugger
             graphicManager.heightReference = this.graphicHeight;
             const option = CesiumPolygon.defaultStyle;
             option.outline = this.outline;
@@ -1345,6 +1382,9 @@ export default {
 }
 </style>
 <style lang='scss'>
+#drawtoolPanel{
+  z-index: 100;
+}
 .model-select-panel {
   display: block;
   width: 340px;

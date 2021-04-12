@@ -132,20 +132,24 @@ export default class MarkerManager {
         const id = this.generateId();
         self.markerid = id;
         const manager = this.manager
-
         const pick = function (e) {
             const cartesian = cvt.pixel2Cartesian(e.position, viewer);
             if (Cesium.defined(cartesian)) {
                 // mp.position = cartesian;
                 let marker;
+                let option_params;
                 if (type === "marker") {
+                    option_params = self.markerOptions;
                     marker = self.createMarker(cartesian);
                 } else if (type === "label") {
+                    option_params = self.labelOptions;
                     marker = self.createLabel(cartesian);
                 } else if (type === "model") {
+                    option_params = self.modelOptions;
                     marker = self.createModel(cartesian);
                 } else {
                     //默认marker
+                    option_params = self.markerOptions;
                     marker = self.createMarker(cartesian);
                 }
                 self.visible = true;
@@ -170,7 +174,8 @@ export default class MarkerManager {
                         name: marker.gvname || '未命名',
                         description: marker.description,
                         type: marker.gvtype,
-                        position: cvt.toDegrees(cartesian,self._viewer)
+                        position: cvt.toDegrees(cartesian, self._viewer),
+                        options: option_params 
                     }
                 })
                 window.dispatchEvent(evt)
@@ -202,23 +207,34 @@ export default class MarkerManager {
         handler.setInputAction(pick, LEFT_CLICK);
         handler.setInputAction(updateTip, MOUSE_MOVE);
     }
-    get(id){
-        if(this.has(id)){
+    get(id) {
+        if (this.has(id)) {
             return this.manager.get(id)
         }
     }
-    has(id){
-        if(this.manager){
+    has(id) {
+        if (this.manager) {
             return this.manager.has(id)
         }
         return false
     }
-    createMarker(cartesian) {
+    createMarker(cartesian,style) {
 
         const mp = this.labelOptions;
+        // eslint-disable-next-line 
+        debugger
+        let markerOptions = this.markerOptions
+        if(style){
+            markerOptions=JSON.parse(style);
+        }
         const marker = new CesiumBillboard(
             this._viewer,
-            { ...this.markerOptions, position: cartesian, image: this.selectedImage },
+            {
+                ...
+                markerOptions,
+                position: cartesian //,
+ //               image: this.selectedImage
+            },
             mp
         );
         return marker;
@@ -407,7 +423,7 @@ export default class MarkerManager {
         this.popDiv = popdiv;
         this._viewer.container.appendChild(this.popDiv);
     }
-    
+
     import(feat) {
         if (feat.geometry.type.toUpperCase() !== "POINT") {
             throw new Error("无效的数据类型.");
@@ -448,8 +464,8 @@ export default class MarkerManager {
         })
         window.dispatchEvent(evt)
     }
-    addMarker(marker){
-        this.manager.set(marker.gvid,marker)
+    addMarker(marker) {
+        this.manager.set(marker.gvid, marker)
     }
     export(type) {
         const managers = this.manager.values();
@@ -547,12 +563,14 @@ export default class MarkerManager {
         this.activeMarker.updateText(this.markName, this.markRemark);
         this.cursorTip.visible = false;
         this.activeMarker.stopEdit()
+        let option_params= this.markerOptions;
         const evt = new CustomEvent('marker-update', {
             detail: {
                 id: this.activeMarker.gvid,
                 name: this.activeMarker.gvname,
-                description:this.activeMarker.description,
-                position:cvt.toDegrees(this.activeMarker.position,this._viewer)
+                description: this.activeMarker.description,
+                position: cvt.toDegrees(this.activeMarker.position, this._viewer),
+                options: option_params
             }
         })
         window.dispatchEvent(evt)

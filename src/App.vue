@@ -8,7 +8,7 @@
  -->
 <template>
   <div id="app">
-    <layout></layout>
+    <layout ref="layout"></layout>
   </div>
 </template>
 
