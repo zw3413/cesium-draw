@@ -1,193 +1,203 @@
 <template>
-  <div style="left: 0; height:auto">
-    <v-app style="left: 0; height:auto">
-      <!-- <v-main> -->
-        <!-- <v-row> -->
-          <v-treeview v-model="item_selected" dense selectable :items="items">
-            <!-- <template v-slot:label="{item, open, selected}">         -->
-            <template v-slot:label="{ item }">
-              <v-btn
-                text
-                @contextmenu="showContextMenu"
-                :id="item.id"
-                :type="item.type"
-              >
-                <!--button icon-->
-                <!-- <v-icon v-if="!item.file">
+  <div>
+       <!-- draw viewer -->
+    <cesiumDrawViewer
+      :extendMarkerImage="imags"
+      ref="marker"
+    ></cesiumDrawViewer>
+    <v-treeview v-model="item_selected"  dense  dark selectable :items="items">
+      <!-- <template v-slot:label="{item, open, selected}">         -->
+      <template v-slot:label="{ item }">
+        <span
+          text
+          @contextmenu="showContextMenu"
+          :id="item.id"
+          :type="item.type"
+        >
+          <!--button icon-->
+          <!-- <v-icon v-if="!item.file">
                       {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
                     </v-icon>
                     <v-icon v-else>
                       {{ files[item.file] }}
                     </v-icon> -->
-                <!--button text-->
-                {{ item.name || "未命名" }}
-              </v-btn>
-            </template>
-          </v-treeview>
-          <v-menu
-            v-model="showMenu"
-            :position-x="x"
-            :position-y="y"
-            fixed
-            :close-on-content-click="contextMenuCloseOnContentClick"
-          >
-            <v-list dense>
-              <v-list-item @click="contextMenuClickAction">
-                <v-list-item-content>
-                  <v-list-item-title id="rename"> 重命名 </v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
+          <!--button text-->
+          {{ item.name || "未命名" }}
+        </span>
+      </template>
+    </v-treeview>
+    <v-menu
+      v-model="showMenu"
+      :position-x="x"
+      :position-y="y"
+      fixed
+      :close-on-content-click="contextMenuCloseOnContentClick"
+    >
+      <v-list dense>
+        <v-list-item @click="contextMenuClickAction">
+          <v-list-item-content>
+            <v-list-item-title id="rename"> 重命名 </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
 
-              <v-list-item @click="contextMenuClickAction">
-                <v-list-item-content>
-                  <v-list-item-title id="showGroups">
-                    移动到
-                  </v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
+        <v-list-item @click="contextMenuClickAction">
+          <v-list-item-content>
+            <v-list-item-title id="showGroups"> 移动到 </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
 
-              <v-list-item @click="contextMenuClickAction">
-                <v-list-item-content>
-                  <v-list-item-title id="del"> 删除 </v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-            </v-list>
-          </v-menu>
+        <v-list-item @click="contextMenuClickAction">
+          <v-list-item-content>
+            <v-list-item-title id="del"> 删除 </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+    </v-menu>
 
-          <v-menu
-            v-model="showSubMenuGroup"
-            :position-x="sub1_x"
-            :position-y="sub1_y"
-            fixed
-          >
-            <v-list dense>
-              <v-list-item
-                v-for="item in groups"
-                :key="item"
-                @click="moveToGroup"
-                :id="item"
-              >
-                <v-list-item-title v-text="item"></v-list-item-title>
-              </v-list-item>
-
-              <v-divider></v-divider>
-
-              <v-list-item @click="moveToGroup" id="newGroup">
-                <v-list-item-title> 新分组 </v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
-        <!-- </v-row> -->
-
-        <!-- 修改名称 -->
-        <v-dialog
-          :v-model="editMode"
-          id="editDialog"
-          persistent
-          max-width="600px"
+    <v-menu
+      v-model="showSubMenuGroup"
+      :position-x="sub1_x"
+      :position-y="sub1_y"
+      fixed
+    >
+      <v-list dense>
+        <v-list-item
+          v-for="item in groups"
+          :key="item"
+          @click="moveToGroup"
+          :id="item"
         >
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              color="primary"
-              dark
-              v-bind="attrs"
-              v-on="on"
-              style="display: none"
-              id="editModeSwith"
-            >
-              Open Dialog
-            </v-btn>
-          </template>
-          <v-card>
-            <v-card-title>
-              <span class="headline">修改</span>
-            </v-card-title>
-            <v-card-text>
-              <v-container>
-                <v-text-field
-                  label="名称"
-                  required
-                  v-model="editedName"
-                ></v-text-field>
-              </v-container>
-            </v-card-text>
+          <v-list-item-title v-text="item"></v-list-item-title>
+        </v-list-item>
 
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" text @click="onCloseEditDialog">
-                关闭
-              </v-btn>
-              <v-btn color="blue darken-1" text @click="onSaveEditDialog">
-                确认
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
+        <v-divider></v-divider>
 
-        <!-- 新增分组 -->
-        <v-dialog v-model="showNewGroupDialog" max-width="600px">
-          <v-card>
-            <v-card-title>
-              <span class="headline">新分组</span>
-            </v-card-title>
-            <v-card-text>
-              <v-container>
-                <v-text-field
-                  label="名称"
-                  required
-                  v-model="newGroupName"
-                ></v-text-field>
-              </v-container>
-            </v-card-text>
+        <v-list-item @click="moveToGroup" id="newGroup">
+          <v-list-item-title> 新分组 </v-list-item-title>
+        </v-list-item>
+      </v-list>
+    </v-menu>
+    <!-- </v-row> -->
 
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" text @click="onCloseNewGroupDialog">
-                关闭
-              </v-btn>
-              <v-btn color="blue darken-1" text @click="onSaveNewGroupDialog">
-                确认
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
+    <!-- 修改名称 -->
+    <v-dialog :v-model="editMode" id="editDialog" persistent max-width="600px">
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn
+          color="primary"
+          dark
+          v-bind="attrs"
+          v-on="on"
+          style="display: none"
+          id="editModeSwith"
+        >
+          Open Dialog
+        </v-btn>
+      </template>
+      <v-card>
+        <v-card-title>
+          <span class="headline">修改</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container>
+            <v-text-field
+              label="名称"
+              required
+              v-model="editedName"
+            ></v-text-field>
+          </v-container>
+        </v-card-text>
 
-        <!-- 确认删除 -->
-        <v-dialog v-model="showConfirmDelDialog" max-width="600px" persistent>
-          <v-card>
-            <v-card-title>
-              <span class="headline">提示</span>
-            </v-card-title>
-            <v-card-text>
-              <v-container> 确认删除吗？ </v-container>
-            </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" text @click="onCloseEditDialog">
+            关闭
+          </v-btn>
+          <v-btn color="blue darken-1" text @click="onSaveEditDialog">
+            确认
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" text @click="onCloseDelDialog">
-                关闭
-              </v-btn>
-              <v-btn color="blue darken-1" text @click="onConfirmDelDialog">
-                确认
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-      <!-- </v-main> -->
-    </v-app>
+    <!-- 新增分组 -->
+    <v-dialog v-model="showNewGroupDialog" max-width="600px">
+      <v-card>
+        <v-card-title>
+          <span class="headline">新分组</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container>
+            <v-text-field
+              label="名称"
+              required
+              v-model="newGroupName"
+            ></v-text-field>
+          </v-container>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" text @click="onCloseNewGroupDialog">
+            关闭
+          </v-btn>
+          <v-btn color="blue darken-1" text @click="onSaveNewGroupDialog">
+            确认
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- 确认删除 -->
+    <v-dialog v-model="showConfirmDelDialog" max-width="600px" persistent>
+      <v-card>
+        <v-card-title>
+          <span class="headline">提示</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container> 确认删除吗？ </v-container>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" text @click="onCloseDelDialog">
+            关闭
+          </v-btn>
+          <v-btn color="blue darken-1" text @click="onConfirmDelDialog">
+            确认
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 <script>
-import { SERVER } from "../js/utils";
-import { CesiumPolyline, CesiumPolygon } from "../core/Graphic";
+import { SERVER } from "../../../js/utils";
+import { CesiumPolyline, CesiumPolygon } from "../../../core/Graphic";
+import cesiumDrawViewer from "@/components/mapViewer/drawerControlContainer/cesiumDrawViewer";
+
 //import WebGLGlobeDataSource from '../core/WebGLGlobeDataSource';
 import utils from "@/js/utils";
 const cvt = utils.CVT;
 const host = SERVER.host;
 export default {
   name: "leftTreePlace",
+  components:{
+   cesiumDrawViewer
+  },
   data: function () {
     return {
+       imags: [
+        "./static/images/markers/1.png",
+        "./static/images/markers/2.png",
+        "./static/images/markers/3.png",
+        "./static/images/markers/4.png",
+        "./static/images/markers/5.png",
+        "./static/images/markers/6.png",
+        "./static/images/markers/7.png",
+        "./static/images/markers/8.png",
+        "./static/images/markers/5.png",
+        "./static/images/markers/6.png",
+      ],
       viewer: null,
       item_current: [],
       item_selected: [],
@@ -337,7 +347,7 @@ export default {
         this.showMenu = true;
       });
     },
-    showPoint: function (jsonData, id, name, desp,style) {
+    showPoint: function (jsonData, id, name, desp, style) {
       const Cesium = window.Cesium;
       let type = 0;
       let x = jsonData.coordinates[0];
@@ -345,11 +355,9 @@ export default {
       let z = jsonData.coordinates[2];
       //let cartesian = new Cesium.Cartesian2(x, y);
       let cartesian = Cesium.Cartesian3.fromDegrees(x, y, z);
-      // let markerManager =
-      //   window.vue.$children[0].$refs.layout.$refs.marker.$refs.markerManager
-      //     .markerManager;
+
       let markerManager = top.markerManager;
-      let marker = markerManager.createMarker(cartesian,style);
+      let marker = markerManager.createMarker(cartesian, style);
       top.markers.set(id, marker);
       marker.gvid = id;
       marker.gvname = name;
@@ -362,22 +370,21 @@ export default {
           name: _n || "未命名",
           description: desp,
           type: type,
-          position: cvt.toDegrees(cartesian, window.viewer),
+          position: cvt.toDegrees(cartesian, window.cesiumViewer),
         },
       });
       window.dispatchEvent(evt);
       window.drawViewer.locateGraphic(id);
-      //window.vue.$children[0].$refs.layout.$refs.marker.locateGraphic(id);
       marker = null;
     },
-    showPolyline: function (jsonData, id, name, desp,style) {
+    showPolyline: function (jsonData, id, name, desp, style) {
       let Cesium = window.Cesium;
-         if (style) {
-            style = JSON.parse(style);
-            let m = style.material;
-            style.material = new Cesium.Color(m.red, m.green, m.blue, m.alpha);
-          }
-      let options = { positions: [],...style };
+      if (style) {
+        style = JSON.parse(style);
+        let m = style.material;
+        style.material = new Cesium.Color(m.red, m.green, m.blue, m.alpha);
+      }
+      let options = { positions: [], ...style };
       /*
       {"clampToGround":true,
       "material":{"red":0.9686274509803922,"green":0.8784313725490196,"blue":0.12549019607843137,"alpha":1},
@@ -398,7 +405,7 @@ export default {
         }
         options.material = window.graphicManager.material || options.material;
         options.width = window.graphicManager.style.width || options.width;
-        const graphic = new CesiumPolyline(window.viewer, options);
+        const graphic = new CesiumPolyline(window.cesiumViewer, options);
         window.graphics.set(id, graphic);
         graphic.gvid = id;
         graphic.id = id;
@@ -420,18 +427,13 @@ export default {
     },
     showPolygon: function (jsonData, id, name, desp, style) {
       let Cesium = window.Cesium;
-       if (style) {
-            style = JSON.parse(style);
-            let m = style.material;
-            style.material = new Cesium.Color(m.red, m.green, m.blue, m.alpha);
-            let o = style.outlineColor;
-            style.outlineColor = new Cesium.Color(
-              o.red,
-              m.green,
-              m.blue,
-              m.alpha
-            );
-          }
+      if (style) {
+        style = JSON.parse(style);
+        let m = style.material;
+        style.material = new Cesium.Color(m.red, m.green, m.blue, m.alpha);
+        let o = style.outlineColor;
+        style.outlineColor = new Cesium.Color(o.red, m.green, m.blue, m.alpha);
+      }
       let options = { positions: [], ...style };
       if (jsonData && jsonData.coordinates && jsonData.coordinates.length > 0) {
         for (let coo of jsonData.coordinates[0]) {
@@ -448,7 +450,7 @@ export default {
         // }
         // options.material = window.graphicManager.material || options.material;
         // options.width = window.graphicManager.style.width || options.width;
-        const graphic = new CesiumPolygon(window.viewer, options);
+        const graphic = new CesiumPolygon(window.cesiumViewer, options);
         window.graphics.set(id, graphic);
         graphic.gvid = id;
         graphic.id = id;
@@ -469,10 +471,6 @@ export default {
       }
     },
     addGeoJSON: function (id) {
-      //options.offset = new Cesium.HeadingPitchRange(Cesium.Math.toRadians(0), Cesium.Math.toRadians(45), 2500);
-      //var promise = Cesium.KmlDataSource.load(
-      //let markerOptions=window.vue.$children[0].$refs.layout.$refs.marker.$refs.markerManager.markerManager.markerOptions
-      //let labelOptions =window.vue.$children[0].$refs.layout.$refs.marker.$refs.markerManager.markerManager.labelOptions
       let that = this;
       fetch(host + "/d3/data/element/" + id, {
         method: "get",
@@ -491,7 +489,7 @@ export default {
           let id = data.id;
           let name = data.name;
           let desp = data.desp;
-          let style= data.style;
+          let style = data.style;
 
           //先检查要加载的元素是否已经在地图上
           if (top.markers.has(id) || top.graphics.has(id)) {
@@ -499,14 +497,14 @@ export default {
           }
 
           let jsonData = JSON.parse(data.geoJson);
-         
+
           switch (jsonData.type) {
             case "Point":
-              that.showPoint(jsonData, id, name, desp,style);
+              that.showPoint(jsonData, id, name, desp, style);
               break;
             case "LineString":
               //type = 1;
-              that.showPolyline(jsonData, id, name, desp,style);
+              that.showPolyline(jsonData, id, name, desp, style);
               break;
             case "Polygon":
               //type = 2;
@@ -519,7 +517,7 @@ export default {
 
           // for (var i = 0; i <= jsonData.features.length; i++) {
           //   var ifeature = jsonData.features[i];
-          //   window.viewer.entities.add({
+          //   window.cesiumViewer.entities.add({
           //     position: Cesium.Cartesian3.fromDegrees(
           //       ifeature.geometry.coordinates[0],
           //       ifeature.geometry.coordinates[1]
@@ -554,7 +552,7 @@ export default {
       this.viewer.dataSources.remove(ds);
 
       let layerManager =
-        window.vue.$children[0].$refs.layout.$refs.marker.$refs.layerManager;
+        window.vue.$children[0].$refs.mapViewer.$refs.marker.$refs.layerManager;
       layerManager.drop({ id: id });
       // if(layerManager && layerManager.json){
       //     let json = layerManager.json;
@@ -635,18 +633,13 @@ export default {
   },
   mounted: function () {
     this.viewer = window.cesiumViewer;
+     this.$refs.marker.init(this.viewer);
     this.list();
     this.getGroups();
   },
 };
 </script>
 <style scoped>
-/* .v-dialog__container {
-    display: unset; 
-} */
-#app{
-  height:auto !important
-}
 .editDialog {
   position: absolute;
 }
@@ -656,37 +649,5 @@ export default {
 .v-menu__content {
   position: fixed !important;
 }
-/* .layer-controller .v-application{
- 
-}  */
-/* .details > .row {
-  border-bottom: 1px dashed lightgrey;
-} */
-.v-form div {
-  margin: 0;
-  padding: 0;
-}
-.v-form .col-md-3.col-12 {
-  padding: 0 12px;
-}
-/* .layer-controller *,
-.layer-controller .theme--light *,
-.layer-controller .theme--light.v-treeview * {
-  color: whitesmoke !important;
-} */
 
-/* .theme--light.v-icon {
-  color: whitesmoke !important;
-} */
-
-/* .theme--light.v-application {
-  background-color: transparent !important;
-} */
-
-/* .layer-controller .v-dialog * {
-  color: rgba(0, 0, 0, 0.87) !important;
-}
-.layer-controller .v-dialog header * {
-  color: whitesmoke !important;
-} */
 </style>

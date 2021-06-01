@@ -13,7 +13,7 @@ const router= new Router({
     {
       path: '/',
       name: 'index',
-      component:  resolve => require(['@/Apps/layout/layout'],resolve)
+      component:  resolve => require(['@/Apps/mapViewer/mapViewer'],resolve)
     }
   ]
 })

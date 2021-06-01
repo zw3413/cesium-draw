@@ -1,12 +1,12 @@
 {
-  "name": "cesium-draw",
-  "version": "3.3.0",
+  "name": "D3-GIS",
+  "version": "0.3.0",
   "private": false,
-  "description": "add a mark,polyline,polygon base on Cesium",
+  "description": "D3-GIS",
   "scripts": {
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "lib": "vue-cli-service build --target lib --name cesiumdrawViewer ./src/index.js",
+    "lib": "vue-cli-service build --target lib --name D3-GIS ./src/index.js",
     "start": "vue-cli-service serve"
   },
   "main": "./dist/cesiumdrawViewer.umd.min.js",
@@ -28,6 +28,7 @@
     "vuex": "^3.6.2"
   },
   "devDependencies": {
+    "@mdi/font": "^5.9.55",
     "@vue/cli-plugin-babel": "^3.11.0",
     "@vue/cli-plugin-eslint": "^3.11.0",
     "@vue/cli-service": "^3.11.0",
@@ -73,9 +74,9 @@
     "> 1%",
     "last 2 versions"
   ],
-  "keyword": "Cesium Polygon Polyline mark interactive",
+  "keyword": "D3GIS",
   "repository": {
     "type": "git",
-    "url": "https://github.com/xtfge/vue-cesium-draw"
+    "url": "https://github.com/zw3413/D3-GIS"
   }
 }

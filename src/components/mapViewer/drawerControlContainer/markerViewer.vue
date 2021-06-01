@@ -56,12 +56,12 @@
 </template>
 
 <script>
-import MarkerManager from "../core/MarkerManager";
-import utils from "../js/utils";
+import MarkerManager from "../../../core/MarkerManager";
+import utils from "../../../js/utils";
 import {
     checkComponent,
     checkViewer
-} from "../js/utils";
+} from "../../../js/utils";
 export default {
     name: "cesiumMarkerViewer",
     data() {

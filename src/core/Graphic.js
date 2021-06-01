@@ -1,10 +1,10 @@
 /*
- * @Author: zhangbo
- * @E-mail: xtfge_0915@163.com
- * @Date: 2019-12-16 19:28:45
- * @LastEditTime: 2020-04-17 14:16:12
- * @Desc: 定义基础图形，包括点线、多边形，(圆，矩形)
+ * @Author: @zhangweicalm 
+ * @Date: 2021-04-23 20:52:06 
+ * @Last Modified by:   @zhangweicalm 
+ * @Last Modified time: 2021-04-23 20:52:06 
  */
+
 import GraphicType from "./GraphicType";
 const Cesium = window.Cesium;
 const defined = Cesium.defined;

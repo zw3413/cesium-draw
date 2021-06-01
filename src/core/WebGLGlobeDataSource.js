@@ -1,3 +1,4 @@
+//not used
 /**
  * This class is an example of a custom DataSource.  It loads JSON data as
  * defined by Google's WebGL Globe, https://github.com/dataarts/webgl-globe.
@@ -14,7 +15,7 @@
  */
 
 export default function WebGLGlobeDataSource(name) {
-    const Cesium = window.Cesium;
+  const Cesium = window.Cesium;
   //All public configuration is defined as ES5 properties
   //These are just the "private" variables and their defaults.
   this._name = name;

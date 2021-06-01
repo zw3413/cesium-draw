@@ -79,7 +79,7 @@
   </div>
 </template>
 <script>
-import { SERVER } from "../js/utils";
+import { SERVER } from "../../../js/utils";
 const host = SERVER.host;
 export default {
   name: "fileManagerButton",

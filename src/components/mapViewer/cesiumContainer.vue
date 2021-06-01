@@ -1,11 +1,10 @@
-<!--
-@Author:zhangbo
-@Date:2019-03-13 10:36:32
-@E-mail:zhangb@geovie.com.cn
-@Last Modified by:zhangbo
-@Modify-Date:2019-9-24 20:07
+/*
+ * @Author: @zhangweicalm 
+ * @Date: 2021-04-12 22:47:14 
+ * @Last Modified by: @zhangweicalm
+ * @Last Modified time: 2021-05-10 21:33:25
+ */
 
--->
 <template>
   <div style="height: 100%" class="fullSize">
     <div class="full-container" :style="viewStyle" id="cesiumContainer"></div>
@@ -17,7 +16,7 @@
 
 <script>
 export default {
-  name: "EarthViewer",
+  name: "CesiumContainer",
   viewerProperty: {},
   props: {
     viewStyle: {},
@@ -39,9 +38,8 @@ export default {
 
     var cesiumAsset =
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwMDhmOGU1Mi1kYTU4LTQ1ZGUtOWQxZS0yMGJiYWMyNjhhOTMiLCJpZCI6MzUyNDUsImlhdCI6MTYwMTU5MTMwMX0.Y0vt0Lnp7En8YK3HqUz8ac-JDnZyAR79qnyh4tKssdE";
-    var tiandituTk = "612ae65756225e3affda8a30ac248fb6";
-    // 天地图服务子域
-    var subdomains = ["0", "1", "2", "3", "4", "5", "6", "7"];
+    // var tiandituTk = "612ae65756225e3affda8a30ac248fb6";
+    // var subdomains = ["0", "1", "2", "3", "4", "5", "6", "7"];
 
     Cesium.Ion.defaultAccessToken = cesiumAsset;
     _this.viewerDefaultProperty = {
@@ -56,25 +54,12 @@ export default {
       navigationInstructionsInitiallyVisible: false, //导航指令
       navigationHelpButton: false, //帮助信息
       selectionIndicator: true, // 选择
-      imageryProvider: new Cesium.WebMapTileServiceImageryProvider({
-        //影像底图
-        url:
-          "http://t{s}.tianditu.com/img_w/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=img&tileMatrixSet=w&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&style=default&format=tiles&tk=" +
-          tiandituTk,
-        subdomains: subdomains,
-        layer: "tdtImgLayer",
-        style: "default",
-        format: "image/jpeg",
-        tileMatrixSetID: "GoogleMapsCompatible", //使用谷歌的瓦片切片方式
-        show: true,
-      })
       //terrainProvider: Cesium.createWorldTerrain(),
     };
 
     for (let property in _this.viewerProperty) {
       _this.viewerDefaultProperty[property] = _this.viewerProperty[property];
     }
-
     const viewer = new Cesium.Viewer("cesiumContainer", {
       animation: false, //动画
       homeButton: true, //home键
@@ -87,22 +72,22 @@ export default {
       navigationInstructionsInitiallyVisible: false, //导航指令
       navigationHelpButton: false, //帮助信息
       selectionIndicator: true, // 选择
-      imageryProvider: new Cesium.WebMapTileServiceImageryProvider({
-        //影像底图
-        url:
-          "http://t{s}.tianditu.com/img_w/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=img&tileMatrixSet=w&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&style=default&format=tiles&tk=" +
-          tiandituTk,
-        subdomains: subdomains,
-        layer: "tdtImgLayer",
-        style: "default",
-        format: "image/jpeg",
-        tileMatrixSetID: "GoogleMapsCompatible", //使用谷歌的瓦片切片方式
-        show: true,
-      })
-     // terrainProvider: Cesium.createWorldTerrain(),
+      imageryProvider: false,
+      // imageryProvider: new Cesium.WebMapTileServiceImageryProvider({
+      //   //影像底图
+      //   url:
+      //     "http://t{s}.tianditu.com/img_w/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=img&tileMatrixSet=w&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&style=default&format=tiles&tk=" +
+      //     tiandituTk,
+      //   subdomains: subdomains,
+      //   layer: "tdtImgLayer",
+      //   style: "default",
+      //   format: "image/jpeg",
+      //   tileMatrixSetID: "GoogleMapsCompatible", //使用谷歌的瓦片切片方式
+      //   show: true,
+      // })
+      // terrainProvider: Cesium.createWorldTerrain(),
     });
     window.cesiumViewer = viewer;
-    window.viewer = viewer;
 
     //支持丢入文件
     viewer.extend(Cesium.viewerDragDropMixin);
@@ -116,17 +101,17 @@ export default {
     viewer.scene.screenSpaceCameraController._maximumZoomRate = 5906376272000; //设置相机放大时的速率
 
     //天地图文字标注
-    viewer.imageryLayers.addImageryProvider(
-      new Cesium.WebMapTileServiceImageryProvider({
-        url:
-          "http://t0.tianditu.com/cva_w/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=cva&tileMatrixSet=w&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&style=default.jpg&tk=" +
-          tiandituTk,
-        layer: "tdtAnnoLayer",
-        style: "default",
-        format: "image/jpeg",
-        tileMatrixSetID: "GoogleMapsCompatible",
-      })
-    );
+    // viewer.imageryLayers.addImageryProvider(
+    //   new Cesium.WebMapTileServiceImageryProvider({
+    //     url:
+    //       "http://t0.tianditu.com/cva_w/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=cva&tileMatrixSet=w&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&style=default.jpg&tk=" +
+    //       tiandituTk,
+    //     layer: "tdtAnnoLayer",
+    //     style: "default",
+    //     format: "image/jpeg",
+    //     tileMatrixSetID: "GoogleMapsCompatible",
+    //   })
+    // );
     //viewer._cesiumWidget._creditContainer.style.display = "none";  // 隐藏cesium ion
 
     var options = {
@@ -154,12 +139,12 @@ export default {
 
     //加载后飞到中国上空
     viewer.camera.flyTo({
-     destination: Cesium.Cartesian3.fromDegrees(103.84, 31.15, 7000000),
-          orientation: {
-            heading: Cesium.Math.toRadians(348.4202942851978),
-            pitch: Cesium.Math.toRadians(-89.74026687972041),
-            roll: Cesium.Math.toRadians(0),
-          },
+      destination: Cesium.Cartesian3.fromDegrees(103.84, 31.15, 7000000),
+      orientation: {
+        heading: Cesium.Math.toRadians(348.4202942851978),
+        pitch: Cesium.Math.toRadians(-89.74026687972041),
+        roll: Cesium.Math.toRadians(0),
+      },
     });
 
     viewer.homeButton.viewModel.command.beforeExecute.addEventListener(

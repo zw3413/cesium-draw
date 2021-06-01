@@ -10,12 +10,12 @@ const GraphicType=(function(){
     function _(){
 
     }
-    _.MARKER=0
-    _.POINT=5
-    _.POLYLINE=1
-    _.POLYGON=2
-    _.LABEL=3
-    _.MODEL=4
+    _.MARKER=0 //点
+    _.POINT=5//点
+    _.POLYLINE=1 //线
+    _.POLYGON=2//面
+    _.LABEL=3//标签
+    _.MODEL=4//模型
     return _
 })()
 export default GraphicType

@@ -29,3 +29,4 @@ yarn-error.log*
 *.sln
 package-lock.json
 >>>>>>> e68548309368f24ea068fdd3da0161ddefe7cefd
+dist/*

@@ -1,19 +1,15 @@
 <template>
-  <!-- <div class="layer-controller"> -->
-    <!-- <v-app style="left: 0;height:auto"> -->
-        <div style="left: 0; height:auto">
-    <v-app style="left: 0; height:auto">
-      <v-main>
-        <!-- <v-row> -->
-          <v-treeview v-model="item_selected" dense selectable :items="items">
-          </v-treeview>
-        <!-- </v-row> -->
-      </v-main>
-    </v-app>
+ <div>
+      <v-treeview 
+      v-model="item_selected" 
+      dense 
+      selectable 
+      :items="items">
+      </v-treeview>
   </div>
 </template>
 <script>
-import { SERVER } from "../js/utils";
+import { SERVER } from "../../../js/utils";
 const host = SERVER.host;
 export default {
   name: "leftTreeFile",
@@ -23,16 +19,15 @@ export default {
       item_current: [],
       item_selected: [],
       ds: {},
-      widgets: false,
     };
   },
   computed: {
     items: {
       get: function () {
-          return this.$store.state.fileList;
+        return this.$store.state.fileList;
       },
       set: function (nv) {
-        this.$store.commit('setFileList',{fileList:nv})
+        this.$store.commit("setFileList", { fileList: nv });
       },
     },
   },
@@ -94,7 +89,7 @@ export default {
         let result = resp.data;
         if (result.code == "200") {
           let data = result.data;
-          this.$store.commit('fileList',{fileList:data});
+          this.$store.commit("fileList", { fileList: data });
         } else {
           alert("获取树形列表出错:" + result.message);
         }
@@ -116,42 +111,5 @@ export default {
 [v-cloak] {
   display: none;
 }
-/* .layer-controller .v-application{
- 
 
-
-}  */
-#app{
-  height:auto !important
-}
-/* .details > .row {
-  border-bottom: 1px dashed lightgrey;
-} */
-.v-form div {
-  margin: 0;
-  padding: 0;
-}
-.v-form .col-md-3.col-12 {
-  padding: 0 12px;
-}
-/* .layer-controller *,
-.layer-controller .theme--light *,
-.layer-controller .theme--light.v-treeview * {
-  color: whitesmoke !important;
-} */
-
-/* .theme--light.v-icon {
-  color: whitesmoke !important;
-} */
-
-/* .theme--light.v-application {
-  background-color: transparent !important;
-} */
-
-/* .layer-controller .v-dialog * {
-  color: rgba(0, 0, 0, 0.87) !important;
-}
-.layer-controller .v-dialog header * {
-  color: whitesmoke !important;
-} */
 </style>
